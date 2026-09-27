@@ -75,5 +75,3 @@ def test_api_services(client):
 
     assert response.status_code == 200
     assert isinstance(response.get_json(), list)
-
-
