@@ -651,7 +651,8 @@ def api_services():
 def health():
     return jsonify({
         "status": "healthy",
-        "commit": COMMIT
+        "commit": COMMIT,
+        "service": "ServicePulse"
     })
 
 

@@ -43,5 +43,7 @@ jobs:
 
     steps:
       - name: Deploy to Render
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}&ref=${{ github.sha }}"
+          curl --fail-with-body -X POST "$RENDER_DEPLOY_HOOK"
