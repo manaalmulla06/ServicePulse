@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Edit {{ service["name"] }} | ServicePulse
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="edit-page">
+
+
+        <div class="edit-card">
+
+
+            <div class="edit-header">
+
+                <div class="add-icon">
+                    ✎
+                </div>
+
+                <div>
+
+                    <p class="breadcrumb">
+                        ServicePulse / Services / Edit
+                    </p>
+
+                    <h1>
+                        Edit Service
+                    </h1>
+
+                    <p>
+                        Update the service information and
+                        response threshold.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <form
+                action="/edit/{{ service['id'] }}"
+                method="POST"
+                class="edit-form"
+            >
+
+
+                <!-- SERVICE NAME -->
+
+                <div class="form-group">
+
+                    <label for="name">
+                        Service Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value="{{ service['name'] }}"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- URL -->
+
+                <div class="form-group">
+
+                    <label for="url">
+                        Service URL
+                    </label>
+
+                    <input
+                        type="url"
+                        id="url"
+                        name="url"
+                        value="{{ service['url'] }}"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- THRESHOLD -->
+
+                <div class="form-group">
+
+                    <label for="threshold">
+                        Response Threshold
+                    </label>
+
+
+                    <div class="input-with-unit">
+
+                        <input
+                            type="number"
+                            id="threshold"
+                            name="threshold"
+                            value="{{ service['threshold'] }}"
+                            min="1"
+                            step="100"
+                            required
+                        >
+
+                        <span>
+                            ms
+                        </span>
+
+                    </div>
+
+
+                    <small class="form-help">
+
+                        Responses above this limit
+                        will be marked as SLOW.
+
+                    </small>
+
+                </div>
+
+
+
+                <!-- BUTTONS -->
+
+                <div class="edit-actions">
+
+                    <a
+                        href="/"
+                        class="cancel-button"
+                    >
+                        Cancel
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+</body>
+
+</html>

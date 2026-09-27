@@ -1,0 +1,341 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ service["name"] }} History | ServicePulse
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="history-page">
+
+
+        <div class="history-container">
+
+
+            <!-- HEADER -->
+
+            <div class="history-header">
+
+
+                <div>
+
+                    <p class="breadcrumb">
+                        ServicePulse / Services / History
+                    </p>
+
+                    <h1>
+                        {{ service["name"] }}
+                    </h1>
+
+                    <p class="history-url">
+                        {{ service["url"] }}
+                    </p>
+
+                </div>
+
+
+                <div class="history-header-actions">
+
+                    <a
+                        href="/check/{{ service['id'] }}"
+                        class="check-button"
+                    >
+                        Check Now
+                    </a>
+
+                    <a
+                        href="/"
+                        class="back-button"
+                    >
+                        Back to Dashboard
+                    </a>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- SERVICE INFORMATION -->
+
+            <div class="history-info">
+
+
+                <div class="history-info-item">
+
+                    <span>
+                        Current Threshold
+                    </span>
+
+                    <strong>
+                        {{ service["threshold"] }} ms
+                    </strong>
+
+                </div>
+
+
+                <div class="history-info-item">
+
+                    <span>
+                        Records Shown
+                    </span>
+
+                    <strong>
+                        {{ checks|length }}
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- HISTORY TABLE -->
+
+            <div class="history-table-card">
+
+
+                <div class="history-table-header">
+
+                    <div>
+
+                        <h2>
+                            Check History
+                        </h2>
+
+                        <p>
+                            Each record stores the threshold
+                            used during that specific check.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                {% if checks %}
+
+
+                <div class="history-table-wrapper">
+
+
+                    <table class="history-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Time
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    HTTP
+                                </th>
+
+                                <th>
+                                    Response Time
+                                </th>
+
+                                <th>
+                                    Threshold
+                                </th>
+
+                                <th>
+                                    Result
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for check in checks %}
+
+
+                            <tr>
+
+
+                                <!-- TIME -->
+
+                                <td>
+
+                                    {{ check["checked_at"] }}
+
+                                </td>
+
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    <span
+                                        class="status-badge status-{{ check['status']|lower }}"
+                                    >
+                                        {{ check["status"] }}
+                                    </span>
+
+                                </td>
+
+
+
+                                <!-- HTTP STATUS -->
+
+                                <td>
+
+                                    {% if check["status_code"] %}
+
+                                        {{ check["status_code"] }}
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+
+                                <!-- RESPONSE TIME -->
+
+                                <td>
+
+                                    {% if check["response_time"] is not none %}
+
+                                        {{ check["response_time"] }} ms
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+
+                                <!-- THRESHOLD -->
+
+                                <td>
+
+                                    {% if check["threshold"] is not none %}
+
+                                        {{ check["threshold"] }} ms
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+
+                                <!-- RESULT -->
+
+                                <td>
+
+                                    {% if check["status"] == "UP" %}
+
+                                        Within threshold
+
+                                    {% elif check["status"] == "SLOW" %}
+
+                                        Above threshold
+
+                                    {% elif check["error_message"] %}
+
+                                        {{ check["error_message"] }}
+
+                                    {% else %}
+
+                                        Request failed
+
+                                    {% endif %}
+
+                                </td>
+
+
+                            </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+                {% else %}
+
+
+                <div class="empty-history">
+
+                    <div class="empty-icon">
+                        ↗
+                    </div>
+
+                    <h3>
+                        No checks yet
+                    </h3>
+
+                    <p>
+                        Run a health check to create
+                        the first history record.
+                    </p>
+
+                </div>
+
+
+                {% endif %}
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
+```

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        http-equiv="refresh"
+        content="30"
+    >
+
+    <title>
+        ServicePulse | Service Monitoring
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="app-container">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    SP
+                </div>
+
+                <div>
+
+                    <h1>
+                        ServicePulse
+                    </h1>
+
+                    <span>
+                        Service Monitoring
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <nav class="navigation">
+
+                <a
+                    href="/"
+                    class="nav-item active"
+                >
+                    <span>▦</span>
+                    Dashboard
+                </a>
+
+
+                <a
+                    href="#services"
+                    class="nav-item"
+                >
+                    <span>◉</span>
+                    Services
+                </a>
+
+
+                <a
+                    href="#add-service"
+                    class="nav-item"
+                >
+                    <span>＋</span>
+                    Add Service
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-footer">
+
+                <div class="system-status">
+
+                    <span class="status-dot"></span>
+
+                    <div>
+
+                        <strong>
+                            System Online
+                        </strong>
+
+                        <small>
+                            Monitoring active
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+
+        <!-- MAIN -->
+
+        <main class="main-content">
+
+
+            <!-- TOPBAR -->
+
+            <header class="topbar">
+
+                <div>
+
+                    <p class="breadcrumb">
+                        Dashboard
+                    </p>
+
+                    <h2>
+                        Service Health
+                    </h2>
+
+                    <p class="page-description">
+                        Monitor availability, performance and
+                        response time of your websites and APIs.
+                    </p>
+
+                </div>
+
+
+                <div class="topbar-actions">
+
+                    <span class="live-indicator">
+
+                        <span class="status-dot"></span>
+
+                        Live Monitoring
+
+                    </span>
+
+
+                    <a
+                        href="#add-service"
+                        class="primary-button"
+                    >
+                        + Add Service
+                    </a>
+
+                </div>
+
+            </header>
+
+
+
+            <!-- STATISTICS -->
+
+            <section class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon total-icon">
+                        #
+                    </div>
+
+                    <div>
+
+                        <p>
+                            Total Services
+                        </p>
+
+                        <h3>
+
+                            {{ services|length }}
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon up-icon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <p>
+                            Services UP
+                        </p>
+
+                        <h3>
+
+                            {{
+                                services
+                                |selectattr("status", "equalto", "UP")
+                                |list
+                                |length
+                            }}
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon slow-icon">
+                        ~
+                    </div>
+
+                    <div>
+
+                        <p>
+                            Services SLOW
+                        </p>
+
+                        <h3>
+
+                            {{
+                                services
+                                |selectattr("status", "equalto", "SLOW")
+                                |list
+                                |length
+                            }}
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon down-icon">
+                        !
+                    </div>
+
+                    <div>
+
+                        <p>
+                            Services DOWN
+                        </p>
+
+                        <h3>
+
+                            {{
+                                services
+                                |selectattr("status", "equalto", "DOWN")
+                                |list
+                                |length
+                            }}
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon time-icon">
+                        ms
+                    </div>
+
+                    <div>
+
+                        <p>
+                            Avg. Response
+                        </p>
+
+                        <h3>
+
+                            {% set response_times = services
+                                |selectattr("response_time")
+                                |map(attribute="response_time")
+                                |list
+                            %}
+
+
+                            {% if response_times %}
+
+                                {{
+                                    (
+                                        response_times|sum
+                                        /
+                                        response_times|length
+                                    )|round(0)|int
+                                }}
+                                ms
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- SERVICES -->
+
+            <section
+                class="services-section"
+                id="services"
+            >
+
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Monitored Services
+                        </h2>
+
+                        <p>
+                            Services are automatically checked
+                            every 30 seconds while this dashboard
+                            is open.
+                        </p>
+
+                    </div>
+
+
+                    <span class="service-count">
+
+                        {{ services|length }}
+                        services
+
+                    </span>
+
+                </div>
+
+
+
+                {% if services %}
+
+
+                    <div class="services-grid">
+
+
+                        {% for service in services %}
+
+
+                            <article class="service-card">
+
+
+                                <!-- SERVICE HEADER -->
+
+                                <div class="service-card-header">
+
+
+                                    <div class="service-info">
+
+
+                                        <div class="service-avatar">
+
+                                            {{
+                                                service["name"][0]
+                                                |upper
+                                            }}
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <h3>
+                                                {{ service["name"] }}
+                                            </h3>
+
+
+                                            <a
+                                                href="{{ service['url'] }}"
+                                                target="_blank"
+                                                class="service-url"
+                                            >
+                                                {{ service["url"] }}
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
+
+
+                                    <!-- STATUS -->
+
+                                    {% if service["status"] == "UP" %}
+
+                                        <span
+                                            class="status-badge status-up"
+                                        >
+
+                                            <span class="status-dot"></span>
+
+                                            UP
+
+                                        </span>
+
+
+                                    {% elif service["status"] == "SLOW" %}
+
+                                        <span
+                                            class="status-badge status-slow"
+                                        >
+
+                                            <span class="status-dot"></span>
+
+                                            SLOW
+
+                                        </span>
+
+
+                                    {% elif service["status"] == "DOWN" %}
+
+                                        <span
+                                            class="status-badge status-down"
+                                        >
+
+                                            <span class="status-dot"></span>
+
+                                            DOWN
+
+                                        </span>
+
+
+                                    {% else %}
+
+                                        <span
+                                            class="status-badge status-unknown"
+                                        >
+
+                                            <span class="status-dot"></span>
+
+                                            NOT CHECKED
+
+                                        </span>
+
+                                    {% endif %}
+
+
+                                </div>
+
+
+
+                                <!-- DETAILS -->
+
+                                <div class="service-details">
+
+
+                                    <div class="detail-item">
+
+                                        <span class="detail-label">
+                                            HTTP Status
+                                        </span>
+
+
+                                        <strong>
+
+                                            {% if service["status_code"] %}
+
+                                                {{ service["status_code"] }}
+
+                                            {% else %}
+
+                                                —
+
+                                            {% endif %}
+
+                                        </strong>
+
+                                    </div>
+
+
+
+                                    <div class="detail-item">
+
+                                        <span class="detail-label">
+                                            Response Time
+                                        </span>
+
+
+                                        <strong>
+
+                                            {% if service["response_time"] %}
+
+                                                {{
+                                                    service["response_time"]
+                                                }}
+                                                ms
+
+                                            {% else %}
+
+                                                —
+
+                                            {% endif %}
+
+                                        </strong>
+
+                                    </div>
+
+
+
+                                    <div class="detail-item">
+
+                                        <span class="detail-label">
+                                            Threshold
+                                        </span>
+
+
+                                        <strong>
+
+                                            {{ service["threshold"] }}
+                                            ms
+
+                                        </strong>
+
+                                    </div>
+
+
+
+                                    <div class="detail-item">
+
+                                        <span class="detail-label">
+                                            Last Checked
+                                        </span>
+
+
+                                        <strong>
+
+                                            {% if service["checked_at"] %}
+
+                                                {{ service["checked_at"] }}
+
+                                            {% else %}
+
+                                                Never
+
+                                            {% endif %}
+
+                                        </strong>
+
+                                    </div>
+
+
+                                </div>
+
+
+
+                                <!-- ERROR -->
+
+                                {% if service["error_message"] %}
+
+                                    <div class="error-message">
+
+                                        <strong>
+                                            Error:
+                                        </strong>
+
+                                        {{ service["error_message"] }}
+
+                                    </div>
+
+                                {% endif %}
+
+
+
+                                <!-- ACTION BUTTONS -->
+
+                                <div class="service-actions">
+
+
+                                    <a
+                                        href="/history/{{ service['id'] }}"
+                                        class="history-button"
+                                    >
+                                        History
+                                    </a>
+
+
+                                    <a
+                                        href="/edit/{{ service['id'] }}"
+                                        class="edit-button"
+                                    >
+                                        Edit
+                                    </a>
+
+
+                                    <a
+                                        href="/delete/{{ service['id'] }}"
+                                        class="delete-button"
+                                    >
+                                        Delete
+                                    </a>
+
+
+                                    <a
+                                        href="/check/{{ service['id'] }}"
+                                        class="check-button"
+                                    >
+                                        Check Now
+                                    </a>
+
+
+                                </div>
+
+
+                            </article>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                {% else %}
+
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ◉
+                        </div>
+
+
+                        <h3>
+                            No services yet
+                        </h3>
+
+
+                        <p>
+                            Add your first website or API to start
+                            monitoring its health.
+                        </p>
+
+
+                        <a
+                            href="#add-service"
+                            class="primary-button"
+                        >
+                            + Add Your First Service
+                        </a>
+
+                    </div>
+
+
+                {% endif %}
+
+
+            </section>
+
+
+
+            <!-- ADD SERVICE -->
+
+            <section
+                class="add-service-section"
+                id="add-service"
+            >
+
+
+                <div class="add-service-card">
+
+
+                    <div class="add-service-heading">
+
+                        <div class="add-icon">
+                            +
+                        </div>
+
+
+                        <div>
+
+                            <h2>
+                                Add a New Service
+                            </h2>
+
+                            <p>
+                                Configure the service and its
+                                maximum acceptable response time.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <form
+                        action="/add"
+                        method="POST"
+                        class="service-form"
+                    >
+
+
+                        <div class="form-group">
+
+                            <label for="name">
+                                Service Name
+                            </label>
+
+
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                placeholder="e.g. Google API"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="url">
+                                Service URL
+                            </label>
+
+
+                            <input
+                                type="url"
+                                id="url"
+                                name="url"
+                                placeholder="https://example.com"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="threshold">
+                                Response Threshold
+                            </label>
+
+
+                            <div class="input-with-unit">
+
+                                <input
+                                    type="number"
+                                    id="threshold"
+                                    name="threshold"
+                                    value="1000"
+                                    min="1"
+                                    step="100"
+                                    required
+                                >
+
+
+                                <span>
+                                    ms
+                                </span>
+
+                            </div>
+
+
+                            <small class="form-help">
+
+                                Responses above this limit
+                                are marked as SLOW.
+
+                            </small>
+
+                        </div>
+
+
+
+                        <button
+                            type="submit"
+                            class="primary-button submit-button"
+                        >
+                            Add & Check Service
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- FOOTER -->
+
+            <footer class="footer">
+
+                <span>
+                    ServicePulse
+                </span>
+
+
+                <span>
+                    Browser-based monitoring •
+                    30 second interval
+                </span>
+
+            </footer>
+
+
+        </main>
+
+    </div>
+    <footer class="site-footer">
+        ServicePulse · Commit {{ commit }}
+    </footer>
+</body>
+
+</html>
